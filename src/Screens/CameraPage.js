@@ -45,7 +45,7 @@ const CameraPage = () => {
         <Text style={{color: 'white', fontSize: 20}}>Click Photo</Text>
       </TouchableOpacity>
       <TouchableOpacity 
-      style={{
+        style={{
         width: '90%', 
         marginTop: 30, 
         height: 50, 

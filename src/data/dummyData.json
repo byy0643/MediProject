@@ -1,0 +1,29 @@
+{
+    "Medicine": 
+    [
+        {
+            "name": "dummyName1",
+            "entpName": "dummyEntp1",
+            "details":{
+            "efficiency": "dummyEfcy1",
+            "usage": "dummyUsage1",
+            "warning": "dummyWarning1",
+            "interaction": "dummyInteraction1",
+            "sideEffect": "dummySideEffect1",
+            "depositMethod": "dummyDepositMethod1"
+            }
+        },
+        {
+            "name": "dummyName2",
+            "entpName": "dummyEntp2",
+            "details":{
+                "efficiency": "dummyEfcy2",
+                "usage": "dummyUsage2",
+                "warning": "dummyWarning2",
+                "interaction": "dummyInteraction2",
+                "sideEffect": "dummySideEffect2",
+                "depositMethod": "dummyDepositMethod2"
+            }
+        }
+    ]
+}

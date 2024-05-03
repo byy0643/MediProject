@@ -1,6 +1,6 @@
 import { features } from "process"
 
-const API_URL='https://vision.googleapis.com/v1/images:annotate?key=AIzaSyD6aeBwDmxQGqbsApM3eefLn4mPyC7-eoA'
+const API_URL='https://vision.googleapis.com/v1/images:annotate?key=AIzaSyCjMKJMmQe7k1_4SdBm6TCsCK5LzkKOfX0'
 
 export const getTextFromImage = async(image) =>{
     const data = {
