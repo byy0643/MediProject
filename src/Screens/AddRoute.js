@@ -6,6 +6,7 @@ import { launchCamera } from 'react-native-image-picker'
 import { getTextFromImage } from './GoogleVision'
 import {Medicine} from '../model'
 import { initMeidicine, removeAllMedicines } from '../data/privateMediService'
+import axios from 'axios'
 
 export default function AddRoute (){
     const [imageData, setImageData] = useState(null)
@@ -19,33 +20,59 @@ export default function AddRoute (){
     const openCamera = async() =>{
         const res = await launchCamera({mediaType: 'photo', includeBase64: true})
         if(!res.didCancel){
-          setImageData(res)
+            setImageData(res)
+        }
+    }
+
+    
+
+
+    const sendData = async (data) => {
+        try{
+            const response = await axios.post("yakhakdasik.up.railway.app/meds", data)
+            console.log ("백엔드로 데이터 전송 완료", response.data)
+        }catch (error){
+            console.error('백엔드로 데이터 전송 중 오류', error)
+        }
+    }
+
+    const loadData = async (url) => {
+        try{
+            const response = await axios.get(url)
+            console.log("백엔드에서 데이터 받아오기 완료")
+        }catch(error){
+            console.error("데이터 받아오기 중 오류", error)
         }
     }
 
     useEffect(()=> {
+        if(imageData !== null){
+            getData()
+        }
         if(loading){
+            //const data = loadData("백엔드 api url")
             Alert.alert(
                 '추출 결과',
                 desc,
                 [
-                    {text: '취소', onPress: ()=>{}, style: 'cancel'},
-                    {text: '추가', onPress: ()=>{}, style: 'destructive'}
+                    {text: '취소', onPress: ()=>{setLoading(false)}, style: 'cancel'},
+                    {text: '추가', onPress: ()=>{setLoading(false)}, style: 'destructive'}
                 ],
                 {cancelable: true,
                 onDismiss: ()=>{}}
             )
         }       
-    }, [desc, loading])
+    }, [loading, imageData])
 
     const getData= async() => {
         try{
-            await openCamera()
+            console.log("데이터 받기 시도")
             const res = await getTextFromImage(imageData.assets[0].base64)
-            setLoading(false)
+            setImageData(null)
             console.log(res.responses[0].textAnnotations[0].description)
-            setDesc(res.responses[0].textAnnotations[0].description) 
+            setDesc(res.responses[0].textAnnotations[0].description)
             setLoading(true)
+            //await sendData({"text": res.responses[0].textAnnotations[0].description})
         }
         catch (error){
             console.log('오류발생', error)
@@ -57,7 +84,7 @@ export default function AddRoute (){
             <View style={styles.content}>
                 <Text style={styles.text}>다양한 방법으로{'\n'}복용하고 있는 약품을 등록할 수 있습니다.</Text>
                 <View style={styles.bContainer}>
-                    <TouchableOpacity style={styles.button} onPress={() => {getData()}}>
+                    <TouchableOpacity style={styles.button} onPress={() => {openCamera()}}>
                         <Text style={styles.text}>카메라를 이용하여{'\n'}추가하기</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.button}>

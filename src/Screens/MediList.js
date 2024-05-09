@@ -4,6 +4,7 @@ import { NavigationContainer, ParamListBase, useNavigation } from '@react-naviga
 import { NativeStackNavigationProp, createNativeStackNavigator } from '@react-navigation/native-stack'
 import {Medicine} from '../model'
 import { getMedicine } from '../data/privateMediService'
+import useCachedResources from '../data/useCachedResources'
 
 export default function MediList (){
     const navigation = useNavigation()
@@ -11,11 +12,32 @@ export default function MediList (){
     const [medicines, setMedicine] = useState([])
     const [count, setCount] = useState(0)
 
+    const isLoaded = useCachedResources()
+
+    let listComp
+    // if(isLoaded){
+    //     listComp = 
+    //     <>
+    //         <Text style={styles.text}>현재 약통이 비어있습니다!</Text>
+    //         <TouchableOpacity style={styles.button} onPress={moveAddRoute}>
+    //             <Text style={styles.text}>내 의약품 추가하기</Text>
+    //         </TouchableOpacity>
+    //     </>
+    // } else {
+    //     listComp = 
+    //     <>
+    //         <FlatList
+    //                 data={medicines}
+    //                 renderItem = {renderItem}
+    //                 keyExtractor={(medicines, index) => medicines.name}
+    //                 ItemSeparatorComponent={() => <View/>} />
+    //     </>
+    // }
+
     // useEffect(()=>{
     //     async function getData(){
     //         const _medicines = await getMedicine()
     //         setMedicine(_medicines)
-    //         setCount(_medicines.length)
     //     }
     //     getData()
     // }, [])
@@ -26,7 +48,6 @@ export default function MediList (){
 
     return(
         <SafeAreaView style={styles.layout}>
-
             <View style={styles.content}>
                 <Text style={styles.text}>현재 약통이 비어있습니다!</Text>
                 <TouchableOpacity style={styles.button} onPress={moveAddRoute}>
@@ -37,6 +58,7 @@ export default function MediList (){
                     renderItem = {renderItem}
                     keyExtractor={(medicines, index) => medicines.name}
                     ItemSeparatorComponent={() => <View/>} /> */}
+                {/* {listComp} */}
             </View>
         </SafeAreaView>
 
