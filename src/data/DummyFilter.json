@@ -1,0 +1,12 @@
+{
+    "Filters":
+    [
+        {
+            "name": "DRUG_SHAPE",
+            "items": [
+                {"circle": "원형"},
+                {"rectangle": "장방형"}
+            ]
+        }
+    ]
+}

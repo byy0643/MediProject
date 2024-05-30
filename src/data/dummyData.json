@@ -5,12 +5,12 @@
             "name": "dummyName1",
             "entpName": "dummyEntp1",
             "details":{
-            "efficiency": "dummyEfcy1",
-            "usage": "dummyUsage1",
-            "warning": "dummyWarning1",
-            "interaction": "dummyInteraction1",
-            "sideEffect": "dummySideEffect1",
-            "depositMethod": "dummyDepositMethod1"
+                "efficiency": "dummyEfcy1",
+                "usage": "dummyUsage1",
+                "warning": "dummyWarning1",
+                "interaction": "dummyInteraction1",
+                "sideEffect": "dummySideEffect1",
+                "depositMethod": "dummyDepositMethod1"
             }
         },
         {

@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import MainNavigator from './src/Screens/MainNavigator'
 import { enableScreens } from 'react-native-screens'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+import BottomTabNav from './src/Screens/BottomTabNav'
 
 //enableScreens()
 

@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { StyleSheet, SafeAreaView, Text, View, TouchableOpacity, FlatList, Item } from 'react-native'
+import { StyleSheet, SafeAreaView, Text, View, TouchableOpacity, FlatList, Item, ScrollView } from 'react-native'
 import { NavigationContainer, ParamListBase, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp, createNativeStackNavigator } from '@react-navigation/native-stack'
 import {Medicine} from '../model'
@@ -48,18 +48,18 @@ export default function MediList (){
 
     return(
         <SafeAreaView style={styles.layout}>
-            <View style={styles.content}>
-                <Text style={styles.text}>현재 약통이 비어있습니다!</Text>
-                <TouchableOpacity style={styles.button} onPress={moveAddRoute}>
-                    <Text style={styles.text}>내 의약품 추가하기</Text>
-                </TouchableOpacity>
-                {/* <FlatList
-                    data={medicines}
-                    renderItem = {renderItem}
-                    keyExtractor={(medicines, index) => medicines.name}
-                    ItemSeparatorComponent={() => <View/>} /> */}
-                {/* {listComp} */}
-            </View>
+            <ScrollView style={flex=1}>
+                {medicines.length > 0 ? 
+                    listData.map()
+                :
+                <View style={styles.content}>
+                    <Text style={styles.text}>현재 약통이 비어있습니다!</Text>
+                    <TouchableOpacity style={styles.button} onPress={moveAddRoute}>
+                        <Text style={styles.text}>내 의약품 추가하기</Text>
+                    </TouchableOpacity>
+                </View>}      
+            </ScrollView>
+
         </SafeAreaView>
 
     )

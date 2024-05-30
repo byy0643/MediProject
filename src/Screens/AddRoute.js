@@ -5,58 +5,69 @@ import {MD2Colors} from "react-native-paper"
 import { launchCamera } from 'react-native-image-picker'
 import { getTextFromImage } from './GoogleVision'
 import {Medicine} from '../model'
-import { initMeidicine, removeAllMedicines } from '../data/privateMediService'
+import { storeMedicine } from '../data/privateMediService'
 import axios from 'axios'
+
 
 export default function AddRoute (){
     const [imageData, setImageData] = useState(null)
     const [loading, setLoading] = useState(false)
     const [desc, setDesc] = useState('')
-
+    const [medication, setMedication] = useState('')
+    const [resend, setResend] = useState({})
 
     const navigation = useNavigation()
-    
-    const moveCameraPage = useCallback(() => navigation.navigate('CameraPage'),[])
+    const moveSearch = useCallback(() => navigation.navigate('Search'),[])
     const openCamera = async() =>{
         const res = await launchCamera({mediaType: 'photo', includeBase64: true})
         if(!res.didCancel){
-            setImageData(res)
+            setImageData(res) 
         }
     }
 
-    
-
-
-    const sendData = async (data) => {
+    const sendData = async (data) => {//OCR 정보 전송
         try{
-            const response = await axios.post("yakhakdasik.up.railway.app/meds", data)
-            console.log ("백엔드로 데이터 전송 완료", response.data)
+            const response = await axios.post("https://yakhakdasik.up.railway.app/meds/extract", data)
+            setResend(response.data)
+            var value = JSON.stringify(response.data)
+            var obj = JSON.parse(value)
+            var medications = obj.medications 
+            console.log ("백엔드로 데이터 전송 완료", obj.medications)
+            let str = ""
+            for(let prop in medications){
+                str+=(medications[prop]+'\n')
+            }
+            setMedication(str)
+            console.log("재전송 데이터 삽입", str)
+            setLoading(true)
         }catch (error){
             console.error('백엔드로 데이터 전송 중 오류', error)
         }
     }
 
-    const loadData = async (url) => {
+    const resendData = async (data) => {//사용자에게 보여준 뒤 정보 가져오기
         try{
-            const response = await axios.get(url)
-            console.log("백엔드에서 데이터 받아오기 완료")
+            const response = await axios.post("https://yakhakdasik.up.railway.app/meds/get-info", data)
+            var value = JSON.stringify(response.data)
+            var obj = JSON.parse(value)
+            console.log("약품정보 불러오기 성공", obj)
+            //storeMedicine(response.data)
+            setLoading(false)
         }catch(error){
-            console.error("데이터 받아오기 중 오류", error)
+            console.error('데이터 재전송중 에러')
         }
     }
-
     useEffect(()=> {
-        if(imageData !== null){
+        if(imageData !== null){//사진을 받으면 곧바로 OCR요청
             getData()
         }
-        if(loading){
-            //const data = loadData("백엔드 api url")
+        if(loading){//화면이 렌더링 되었을때 같이 발생하는것을 방지
             Alert.alert(
                 '추출 결과',
-                desc,
+                medication,
                 [
                     {text: '취소', onPress: ()=>{setLoading(false)}, style: 'cancel'},
-                    {text: '추가', onPress: ()=>{setLoading(false)}, style: 'destructive'}
+                    {text: '추가', onPress: ()=>{resendData(resend)}, style: 'destructive'}
                 ],
                 {cancelable: true,
                 onDismiss: ()=>{}}
@@ -71,8 +82,8 @@ export default function AddRoute (){
             setImageData(null)
             console.log(res.responses[0].textAnnotations[0].description)
             setDesc(res.responses[0].textAnnotations[0].description)
-            setLoading(true)
-            //await sendData({"text": res.responses[0].textAnnotations[0].description})
+
+            await sendData({"text": res.responses[0].textAnnotations[0].description})
         }
         catch (error){
             console.log('오류발생', error)
@@ -87,7 +98,7 @@ export default function AddRoute (){
                     <TouchableOpacity style={styles.button} onPress={() => {openCamera()}}>
                         <Text style={styles.text}>카메라를 이용하여{'\n'}추가하기</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.button}>
+                    <TouchableOpacity style={styles.button} onPress={moveSearch}>
                         <Text style={styles.text}>의약품 직접{'\n'}검색하기</Text>
                     </TouchableOpacity>
                 </View>  
