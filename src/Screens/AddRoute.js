@@ -32,13 +32,13 @@ export default function AddRoute (){
             var value = JSON.stringify(response.data)
             var obj = JSON.parse(value)
             var medications = obj.medications 
-            console.log ("백엔드로 데이터 전송 완료", obj.medications)
+            console.log ("백엔드로 데이터 전송 완료\n", obj.medications)
             let str = ""
             for(let prop in medications){
                 str+=(medications[prop]+'\n')
             }
             setMedication(str)
-            console.log("재전송 데이터 삽입", str)
+            console.log("재전송 데이터 삽입\n", str)
             setLoading(true)
         }catch (error){
             console.error('백엔드로 데이터 전송 중 오류', error)
@@ -47,14 +47,15 @@ export default function AddRoute (){
 
     const resendData = async (data) => {//사용자에게 보여준 뒤 정보 가져오기
         try{
+            console.log("재전송할 데이터\n", data)
             const response = await axios.post("https://yakhakdasik.up.railway.app/meds/get-info", data)
             var value = JSON.stringify(response.data)
             var obj = JSON.parse(value)
-            console.log("약품정보 불러오기 성공", obj)
+            console.log("약품정보 불러오기 성공\n", response.data)
             //storeMedicine(response.data)
             setLoading(false)
         }catch(error){
-            console.error('데이터 재전송중 에러')
+            console.error('데이터 재전송중 에러', error)
         }
     }
     useEffect(()=> {

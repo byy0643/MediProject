@@ -5,6 +5,7 @@ import CameraPage from './CameraPage'
 import AddRoute from "./AddRoute"
 import BottomTabNav from "./BottomTabNav"
 import Search from "./Search"
+import MediInfo from "./MediInfo"
 
 export default function MainNavigator(){
     const Stack = createStackNavigator()
@@ -14,6 +15,7 @@ export default function MainNavigator(){
             <Stack.Screen name="BottomTabNav" component={BottomTabNav} options={{headerShown: false, animationEnabled: false}} />
             <Stack.Screen name="Search" component={Search} options={{headerShown: false}} />
             <Stack.Screen name="AddRoute" component={AddRoute} options={{headerShown: false}} />
+            <Stack.Screen name="MediInfo" component={MediInfo} options={{title: '약품 정보'}}/>
             <Stack.Screen name="CameraPage" component={CameraPage} />
         </Stack.Navigator>
     )

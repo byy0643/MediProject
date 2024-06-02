@@ -2,28 +2,30 @@
     "Medicine": 
     [
         {
-            "name": "dummyName1",
-            "entpName": "dummyEntp1",
-            "details":{
-                "efficiency": "dummyEfcy1",
-                "usage": "dummyUsage1",
-                "warning": "dummyWarning1",
-                "interaction": "dummyInteraction1",
-                "sideEffect": "dummySideEffect1",
-                "depositMethod": "dummyDepositMethod1"
-            }
+            "id": 195900043,
+            "companyName": "삼진제약(주)",
+            "medName": "아네모정",
+            "imageUrl": "https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/152035092098000085",
+            "effect": "effect",
+            "howToUse": "how to use",
+            "criticalInfo": "critical info",
+            "warning": "warning",
+            "interaction": "interaction",
+            "sideEffect": "side effect",
+            "howToStore": "how to store" 
         },
         {
-            "name": "dummyName2",
-            "entpName": "dummyEntp2",
-            "details":{
-                "efficiency": "dummyEfcy2",
-                "usage": "dummyUsage2",
-                "warning": "dummyWarning2",
-                "interaction": "dummyInteraction2",
-                "sideEffect": "dummySideEffect2",
-                "depositMethod": "dummyDepositMethod2"
-            }
+            "id": 197100015,
+            "companyName": "동아제약(주)",
+            "medName": "타치온정50밀리그램(글루타티온(환원형))",
+            "imageUrl": "https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1NOwp2F66kj",
+            "effect": "effect",
+            "howToUse": "how to use",
+            "criticalInfo": "critical info",
+            "warning": "warning",
+            "interaction": "interaction",
+            "sideEffect": "side effect",
+            "howToStore": "how to store" 
         }
     ]
 }

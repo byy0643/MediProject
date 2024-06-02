@@ -7,24 +7,33 @@ import { Dropdown } from 'react-native-element-dropdown'
 import filterData from '../data/unique_values.json'
 import axios from 'axios'
 
+const filterString = JSON.stringify(filterData)
+const filterObj = JSON.parse(filterString)
+
+
 export default function Search(){
     const [isOpen, setIsOpen] = useState(false)
+    const [filterList, setFilterList] = useState({
+        drugShape: '',
+        colorClass1: '',
+        colorClass2: '',
+        lineFront: '',
+        lineBack: '',
+        formCodeName: '',
+    })
     const [drugShape, setDrugShape] = useState(null);
     const [colorClass1, setColorClass1] = useState(null);
     const [colorClass2, setColorClass2] = useState(null);
     const [lineFront, setLineFront] = useState(null);
     const [lineBack, setLineBack] = useState(null);
 
+
+
     async function sendData(){
         try{
-            const response = await axios.post("https://yakhakdasik.up.railway.app/pills", {
-                "drugShape" : drugShape,
-                "colorClass1" : colorClass1,
-                "colorClass2" : colorClass2,
-                "lineFront" : lineFront,
-                "lineBack" : lineBack,
-                "formCodeName" : null,
-            })
+            console.log("보낼 데이터", filterList)
+            const response = await axios.post("https://yakhakdasik.up.railway.app/pills?page=5&limit=5", JSON.stringify(filterList))
+            console.log("필터 항목 전송 성공", response.data)
         }catch(error){
             console.error('필터 항목 전송중 에러', error)
         }
@@ -45,15 +54,18 @@ export default function Search(){
                 <View style={{borderBottomWidth: 1, height: '60%'}}>
                     <ScrollView>
                         <Dropdown
-                            data = {filterData.Filters[0].items}
+                            data = {filterObj.Filters[0].items}
                             search
-                            labelField="item"
-                            valueField="id"
+                            labelField='item'
+                            valueField='id'
                             placeholder='모양'
                             searchPlaceholder='Search..'
                             value={drugShape}
                             onChange={item=>{
-                                setDrugShape(item.value)
+                                setDrugShape(item.id)
+                                setFilterList(filterList=>({...filterList, drugShape: item.item}))
+                                console.log("모양 ", item.item)
+                                console.log("데이터 업데이트", filterList)
                             }}
                         />
                         <Dropdown
@@ -65,11 +77,14 @@ export default function Search(){
                             searchPlaceholder='Search..'
                             value={colorClass1}
                             onChange={item=>{
-                                setColorClass1(item.value)
+                                setColorClass1(item.id)
+                                setFilterList(filterList=>({...filterList, colorClass1: item.item}))
+                                console.log("색상(앞) ", item.item)
+                                console.log("데이터 업데이트", filterList)
                             }}
                         />
                         <Dropdown
-                            data = {filterData.Filters[2].items}
+                            data = {filterObj.Filters[2].items}
                             search
                             labelField="item"
                             valueField="id"
@@ -77,11 +92,14 @@ export default function Search(){
                             searchPlaceholder='Search..'
                             value={colorClass2}
                             onChange={item=>{
-                                setColorClass2(item.value)
+                                setColorClass2(item.id)                                
+                                setFilterList(filterList=>({...filterList, colorClass2: item.item}))
+                                console.log("모양 ", item.item)
+                                console.log("데이터 업데이트", filterList)
                             }}
                         />
                         <Dropdown
-                            data = {filterData.Filters[3].items}
+                            data = {filterObj.Filters[3].items}
                             search
                             labelField="item"
                             valueField="id"
@@ -89,11 +107,14 @@ export default function Search(){
                             searchPlaceholder='Search..'
                             value={lineFront}
                             onChange={item=>{
-                                setLineFront(item.value)
+                                setLineFront(item.id)
+                                setFilterList(filterList=>({...filterList, lineFront: item.item}))
+                                console.log("모양 ", item.item)
+                                console.log("데이터 업데이트", filterList)
                             }}
                         />
                         <Dropdown
-                            data = {filterData.Filters[4].items}
+                            data = {filterObj.Filters[4].items}
                             search
                             labelField="item"
                             valueField="id"
@@ -101,7 +122,10 @@ export default function Search(){
                             searchPlaceholder='Search..'
                             value={lineBack}
                             onChange={item=>{
-                                setLineBack(item.value)
+                                setLineBack(item.id)
+                                setFilterList(filterList=>({...filterList, lineBack: item.item}))
+                                console.log("모양 ", item.item)
+                                console.log("데이터 업데이트", filterList)
                             }}
                         />
                     </ScrollView>
