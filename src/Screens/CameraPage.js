@@ -18,6 +18,7 @@ const CameraPage = () => {
       setImageData(res)
     }
   }
+  
   const getData= () => {
     setLoading(true)
     getTextFromImage(imageData.assets[0].base64).then(res=>{

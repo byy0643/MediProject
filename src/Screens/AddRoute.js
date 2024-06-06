@@ -4,9 +4,11 @@ import { NavigationContainer, ParamListBase, useNavigation } from '@react-naviga
 import {MD2Colors} from "react-native-paper"
 import { launchCamera } from 'react-native-image-picker'
 import { getTextFromImage } from './GoogleVision'
-import {Medicine} from '../model'
-import { storeMedicine } from '../data/privateMediService'
+import {Medicine} from '../data/dummyData.json'
+import { removeAllMedicines, storeMedicine } from '../data/privateMediService'
 import axios from 'axios'
+import { removeAllListeners } from 'process'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 export default function AddRoute (){
@@ -18,11 +20,24 @@ export default function AddRoute (){
 
     const navigation = useNavigation()
     const moveSearch = useCallback(() => navigation.navigate('Search'),[])
+    const moveList = useCallback(() => navigation.navigate('BottomTabNav'),[])
+
     const openCamera = async() =>{
-        const res = await launchCamera({mediaType: 'photo', includeBase64: true})
-        if(!res.didCancel){
-            setImageData(res) 
+        try{
+            console.log("카메라 열림")
+            const res = await launchCamera({mediaType: 'photo', includeBase64: true})
+            if(!res.didCancel){
+                setImageData(res) 
+            }
+        }catch(error){
+            console.error("카메라 오류", error)
         }
+        
+    }
+
+    const testRemove = () =>{
+        AsyncStorage.clear()
+        setLoading(false)
     }
 
     const sendData = async (data) => {//OCR 정보 전송
@@ -52,7 +67,19 @@ export default function AddRoute (){
             var value = JSON.stringify(response.data)
             var obj = JSON.parse(value)
             console.log("약품정보 불러오기 성공\n", response.data)
-            //storeMedicine(response.data)
+
+            //받은 데이터 저장
+            const dummyString = JSON.stringify(Medicine)
+            const dummyObj = JSON.parse(dummyString)
+            
+            for(idx in dummyObj){
+                console.log("저장할 데이터 키\n", dummyObj[idx].id.toString() )
+                console.log("저장할 데이터 정보\n", dummyObj[idx])
+                const key = dummyObj[idx].id.toString()
+                await storeMedicine(key, dummyObj[idx])
+            }
+
+            moveList()
             setLoading(false)
         }catch(error){
             console.error('데이터 재전송중 에러', error)
@@ -67,7 +94,7 @@ export default function AddRoute (){
                 '추출 결과',
                 medication,
                 [
-                    {text: '취소', onPress: ()=>{setLoading(false)}, style: 'cancel'},
+                    {text: '취소', onPress: ()=>{testRemove()}, style: 'cancel'},
                     {text: '추가', onPress: ()=>{resendData(resend)}, style: 'destructive'}
                 ],
                 {cancelable: true,
@@ -83,7 +110,6 @@ export default function AddRoute (){
             setImageData(null)
             console.log(res.responses[0].textAnnotations[0].description)
             setDesc(res.responses[0].textAnnotations[0].description)
-
             await sendData({"text": res.responses[0].textAnnotations[0].description})
         }
         catch (error){
