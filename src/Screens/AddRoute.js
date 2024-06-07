@@ -5,10 +5,11 @@ import {MD2Colors} from "react-native-paper"
 import { launchCamera } from 'react-native-image-picker'
 import { getTextFromImage } from './GoogleVision'
 import {Medicine} from '../data/dummyData.json'
-import { removeAllMedicines, storeMedicine } from '../data/privateMediService'
+import { getAllMedicines, removeAllMedicines, storeDurInfo, storeMedicine } from '../data/privateMediService'
 import axios from 'axios'
 import { removeAllListeners } from 'process'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { storeData } from '../data/AsyncService'
 
 
 export default function AddRoute (){
@@ -17,6 +18,8 @@ export default function AddRoute (){
     const [desc, setDesc] = useState('')
     const [medication, setMedication] = useState('')
     const [resend, setResend] = useState({})
+    const [medicines, setMedicines] = useState([])
+    const [ids, setIds] = useState([])
 
     const navigation = useNavigation()
     const moveSearch = useCallback(() => navigation.navigate('Search'),[])
@@ -33,6 +36,22 @@ export default function AddRoute (){
             console.error("카메라 오류", error)
         }
         
+    }
+
+    const getListIDs = async () =>{
+        try{
+            const res = await getAllMedicines()
+            setMedicines(res)
+
+            setMedicines(prevState => {
+                const keyAry = medicines.map(element=>element.id)
+                setIds({currentMedications: keyAry})
+                console.log("키 받아오기", { currentMedications: keyAry });
+                return prevState;
+            })
+        }catch(error){
+            console.error(error)
+        }
     }
 
     const testRemove = () =>{
@@ -54,6 +73,7 @@ export default function AddRoute (){
             }
             setMedication(str)
             console.log("재전송 데이터 삽입\n", str)
+            await getListIDs()
             setLoading(true)
         }catch (error){
             console.error('백엔드로 데이터 전송 중 오류', error)
@@ -62,21 +82,27 @@ export default function AddRoute (){
 
     const resendData = async (data) => {//사용자에게 보여준 뒤 정보 가져오기
         try{
+            Object.assign(data, ids)
             console.log("재전송할 데이터\n", data)
-            const response = await axios.post("https://yakhakdasik.up.railway.app/meds/get-info", data)
+            const response = await axios.post("https://yakhakdasik.up.railway.app/meds/get-info", data, 
+                {
+                    headers: {
+                        'Accept': '*/*',
+                        'Content-Type': 'application/json'
+                    }
+                }
+            )
             var value = JSON.stringify(response.data)
             var obj = JSON.parse(value)
             console.log("약품정보 불러오기 성공\n", response.data)
 
-            //받은 데이터 저장
-            const dummyString = JSON.stringify(Medicine)
-            const dummyObj = JSON.parse(dummyString)
-            
-            for(idx in dummyObj){
-                console.log("저장할 데이터 키\n", dummyObj[idx].id.toString() )
-                console.log("저장할 데이터 정보\n", dummyObj[idx])
-                const key = dummyObj[idx].id.toString()
-                await storeMedicine(key, dummyObj[idx])
+            for(idx in response.data.medInfos){
+                const key = response.data.medInfos[idx].id.toString()
+                await storeMedicine(key, response.data.medInfos[idx])
+            }
+
+            if(response.data.durInfos.length > 0){
+                await storeDurInfo(response.data.durInfos)
             }
 
             moveList()
@@ -85,7 +111,11 @@ export default function AddRoute (){
             console.error('데이터 재전송중 에러', error)
         }
     }
+
     useEffect(()=> {
+        if(ids.length < 1){
+            getListIDs()
+        }
         if(imageData !== null){//사진을 받으면 곧바로 OCR요청
             getData()
         }
@@ -100,7 +130,7 @@ export default function AddRoute (){
                 {cancelable: true,
                 onDismiss: ()=>{}}
             )
-        }       
+        }     
     }, [loading, imageData])
 
     const getData= async() => {

@@ -14,11 +14,29 @@ export const getMedicine = async (key) =>{
 export const getAllMedicines = async () =>{
     try{
         const keys = await getAllKeys()
-        const valuesPromises = keys.map(key=>getMedicine(key))
+        const noDurKeys = keys.filter((element) => element !== "DurInfo")
+        const valuesPromises = noDurKeys.map(key=>getMedicine(key))
         const values = await Promise.all(valuesPromises)
         return values
     }catch(error){
         console.error("모든 데이터 불러오는중 에러", error)
+    }
+}
+
+export const getDurInfo = async() =>{
+    try{
+        const value = await getData("DurInfo")
+        return value
+    }catch(error){
+        console.error("데이터 불러오는 중 에러", error)
+    }
+}
+
+export const storeDurInfo = async (value) =>{
+    try{
+        await storeData("DurInfo", value)
+    }catch(error){
+        console.error("DUR 정보 저장중 오류", error)
     }
 }
 

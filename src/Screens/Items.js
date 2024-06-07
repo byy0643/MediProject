@@ -1,14 +1,54 @@
-import React, { useRef, useState, useCallback } from 'react'
-import { StyleSheet, SafeAreaView, Text, View, TouchableOpacity, Image } from 'react-native'
+import React, { useRef, useState, useCallback, useEffect } from 'react'
+import { StyleSheet, SafeAreaView, Text, View, TouchableOpacity, Image, TouchableHighlight, Alert } from 'react-native'
 import { useNavigation} from '@react-navigation/native'
+import { removeMedicine } from '../data/privateMediService'
 
-export default function Items({props}){//약품 리스트 포멧
+export default function Items({props, isDur}){//약품 리스트 포멧
     const navigation = useNavigation()
-    const moveMediInfo = useCallback(() => navigation.navigate('MediInfo'),[])
+    const moveMediInfo = useCallback(() => navigation.navigate('MediInfo', {route: {
+        id: props.id,
+        medName: props.medName,
+        companyName: props.companyName,
+        image: props.image,
+        medClass: props.medClass,
+        medType: props.medType,
+        effect: props.effect,
+        pillCheck: props.pillCheck,
+        medInteraction: props.medInteraction,
+        underlyingConditionWarn: props.underlyingConditionWarn,
+        genaralWarn: props.genaralWarn,
+        pregnancyWarn: props.pregnancyWarn,
+        foodInteraction: props.foodInteraction,
+        suppInteraction: props.suppInteraction,
+        howToUse: props.howToUse,
+        howToStore: props.howToStore,
+        detailedCriticalInfo: props.detailedCriticalInfo,
+        detailedWarning: props.detailedWarning,
+        detailedInteraction: props.detailedInteraction,
+        detailedSideEffect: props.detailedSideEffect
+    }}),[])
+    
+    const remove = (id) =>{
+        removeMedicine(id)
+        console.log("removed")
+    }
+
+    const _onLongPressButton = () => {
+        Alert.alert(
+        "삭제", 
+        "삭제하시겠습니까?", 
+        [
+            {text: '취소', onPress: ()=>{}, style: 'cancel'},
+            {text: '삭제', onPress: ()=>{remove(props.id.toString())}, style: 'destructive'}
+        ],
+        {cancelable: true,
+            onDismiss: ()=>{}})
+    }
+
     return(
         <SafeAreaView>
-            <TouchableOpacity style={styles.viewBox} onPress={moveMediInfo}>
-                <Image src={props.imageUrl} style={styles.image}/>
+            <TouchableOpacity style={isDur ? styles.durViewBox : styles.viewBox} onPress={moveMediInfo} onLongPress={_onLongPressButton}>
+                <Image src={props.image} style={styles.image}/>
                 <View style={styles.textBox}>
                     <Text style={styles.mediName}>
                         {props.medName}
@@ -24,8 +64,9 @@ export default function Items({props}){//약품 리스트 포멧
 
 const styles = StyleSheet.create({
     viewBox: { flexDirection: "row", padding: 5, marginBottom: 5, borderWidth: 1, borderColor: 'black'},
-    image: {width: 100, height: 50, borderWidth: 1, borderColor: 'black'},
-    textBox: {marginHorizontal: 10},
-    mediName: {fontSize : 16, fontWeight: 'bold'},
-    entpName: {fontSize: 10, color: 'gray'}
+    durViewBox: { flexDirection: "row", padding: 5, marginBottom: 5, borderWidth: 1, borderColor: 'red'},
+    image: {width: 120, height: 65, borderWidth: 1, borderColor: 'black'},
+    textBox: {marginHorizontal: 10, flex:1},
+    mediName: {fontSize : 15, fontWeight: 'bold', color: 'black'},
+    entpName: {fontSize: 12, color: 'gray'}
 })

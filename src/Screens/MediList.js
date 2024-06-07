@@ -3,7 +3,7 @@ import { StyleSheet, SafeAreaView, Text, View, TouchableOpacity, FlatList, Item,
 import { NavigationContainer, ParamListBase, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp, createNativeStackNavigator } from '@react-navigation/native-stack'
 import {Medicine} from '../model'
-import { getAllMedicines, getMedicine } from '../data/privateMediService'
+import { getAllMedicines, getDurInfo, getMedicine } from '../data/privateMediService'
 import { getData } from '../data/AsyncService'
 import Items from './Items'
 
@@ -11,19 +11,57 @@ export default function MediList (){
     const navigation = useNavigation()
     const moveAddRoute = useCallback(() => navigation.navigate('AddRoute'),[])
     const [medicines, setMedicines] = useState([])
+    const [durInfo, setDurInfo] = useState([])
 
     useEffect(()=>{
         getAllMedicines().then(res=>{
             setMedicines(res)
         })
+        getDurInfo().then(res=>{
+            setDurInfo(res)
+        })
+        // if(loading){//화면이 렌더링 되었을때 같이 발생하는것을 방지
+        //     Alert.alert(
+        //         '병용 금기',
+        //         durInfo.contraindicateReason,
+        //         [
+        //             {text: '취소', onPress: ()=>{testRemove()}, style: 'cancel'},
+        //             {text: '확인', onPress: ()=>{resendData(resend)}, style: 'destructive'}
+        //         ],
+        //         {cancelable: true,
+        //         onDismiss: ()=>{}}
+        //     )
+        // } 
     }, [])
+
+    const isDur = (chkid) =>{
+        if(durInfo !== undefined){
+            for(idx in durInfo){
+                if(durInfo === chkid) return true
+            }
+        }
+        return false
+    }
 
     return(
         <SafeAreaView style={styles.layout}>
             {medicines.length > 0 ? (
                 <FlatList
                     data={medicines}
-                    renderItem={({item}) => <Items props={item}/>}
+                    renderItem={({item}) => 
+                        {   
+                            if(isDur(item.id)){
+                                return(
+                                    <Items props={item} isDur={true}/>
+                                )
+                            }
+                            else{
+                                return(
+                                    <Items props={item} isDur={false}/>
+                                )
+                            }
+                        }
+                    }
                     keyExtractor={(item, index) => item.id}
                     />
             ) : (
