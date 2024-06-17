@@ -20,6 +20,7 @@ export default function BottomTabNav(){
                 component={MediList}
                 options={{
                     title: '나의 약품보기',
+                    unmountOnBlur: true,
                     headerRight: ()=>(
                         <TouchableOpacity
                             onPress={()=>moveAddRoute()}

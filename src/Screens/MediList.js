@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react'
-import { StyleSheet, SafeAreaView, Text, View, TouchableOpacity, FlatList, Item, ScrollView } from 'react-native'
-import { NavigationContainer, ParamListBase, useNavigation } from '@react-navigation/native'
+import { StyleSheet, SafeAreaView, Text, View, TouchableOpacity, FlatList, Item, ScrollView, Alert } from 'react-native'
+import { NavigationContainer, ParamListBase, useNavigation, useIsFocused } from '@react-navigation/native'
 import { NativeStackNavigationProp, createNativeStackNavigator } from '@react-navigation/native-stack'
 import {Medicine} from '../model'
-import { getAllMedicines, getDurInfo, getMedicine } from '../data/privateMediService'
+import { getAllMedicines, getDurInfo, getMedicine, removeDurInfo } from '../data/privateMediService'
 import { getData } from '../data/AsyncService'
 import Items from './Items'
 
@@ -12,57 +12,95 @@ export default function MediList (){
     const moveAddRoute = useCallback(() => navigation.navigate('AddRoute'),[])
     const [medicines, setMedicines] = useState([])
     const [durInfo, setDurInfo] = useState([])
+    const [isDurCondition, setIsDurCondition] = useState(false)
+    const [isRemoved, setIsRemoved] = useState(false)
+    const isFocused = useIsFocused()
+    let durMessage = ''
 
     useEffect(()=>{
         getAllMedicines().then(res=>{
             setMedicines(res)
         })
-        getDurInfo().then(res=>{
-            setDurInfo(res)
-        })
-        // if(loading){//화면이 렌더링 되었을때 같이 발생하는것을 방지
-        //     Alert.alert(
-        //         '병용 금기',
-        //         durInfo.contraindicateReason,
-        //         [
-        //             {text: '취소', onPress: ()=>{testRemove()}, style: 'cancel'},
-        //             {text: '확인', onPress: ()=>{resendData(resend)}, style: 'destructive'}
-        //         ],
-        //         {cancelable: true,
-        //         onDismiss: ()=>{}}
-        //     )
-        // } 
-    }, [])
+        if(durInfo === undefined || durInfo.length < 1){
+            getDurInfo().then(res=>{
+                setDurInfo(res)
+            })
+        }
+        checkDur()
+        if(isDurCondition){//화면이 렌더링 되었을때 같이 발생하는것을 방지
+            Alert.alert(
+                '병용 금기',
+                durMessage,
+                [
+                    {text: '취소', onPress: ()=>{}, style: 'cancel'},
+                    {text: '확인', onPress: ()=>{removeDurInfo()}, style: 'destructive'}
+                ],
+                {cancelable: true,
+                onDismiss: ()=>{}}
+            )
+        }
+        setRemovedFalse()
+
+    }, [isDurCondition, durInfo, isFocused, isRemoved])
+
+    const checkDur = () =>{
+        if(durInfo !== undefined && durInfo.length > 0){
+            setIsDurCondition(true)
+            console.log("Change True")
+            for(idx in durInfo){
+                durMessage = durMessage + durInfo[idx].contraindicateReason + '\n'
+            }
+        }
+    }
 
     const isDur = (chkid) =>{
-        if(durInfo !== undefined){
+        if(isDurCondition){
             for(idx in durInfo){
-                if(durInfo === chkid) return true
+                for(j in durInfo[idx].ids){
+                    if(chkid === durInfo[idx].ids[j]) return true
+                }
             }
         }
         return false
     }
 
+    const setRemovedFalse = () =>{
+        if(isRemoved === true){
+            setIsRemoved(false)
+            console.log("reset")
+        }
+
+
+    }
+
+    const setRemovedTrue = async () => {
+        setIsRemoved(true)
+        await getAllMedicines().then(res=>{
+            setMedicines(res)
+        })
+        console.log("Removed")
+    }
+
     return(
         <SafeAreaView style={styles.layout}>
-            {medicines.length > 0 ? (
+            {medicines !== undefined && medicines.length > 0 ? (
                 <FlatList
                     data={medicines}
+                    keyExtractor={(item, index) => item.id}
                     renderItem={({item}) => 
                         {   
                             if(isDur(item.id)){
                                 return(
-                                    <Items props={item} isDur={true}/>
+                                    <Items props={item} isDur={true} listRemoved={setRemovedTrue}/>
                                 )
                             }
                             else{
                                 return(
-                                    <Items props={item} isDur={false}/>
+                                    <Items props={item} isDur={false} listRemoved={setRemovedTrue}/>
                                 )
                             }
                         }
                     }
-                    keyExtractor={(item, index) => item.id}
                     />
             ) : (
                 <View style={styles.content}>

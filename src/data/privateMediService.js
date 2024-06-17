@@ -23,6 +23,10 @@ export const getAllMedicines = async () =>{
     }
 }
 
+export const removeDurInfo = async() => {
+    await removeData("DurInfo")
+}
+
 export const getDurInfo = async() =>{
     try{
         const value = await getData("DurInfo")
@@ -31,6 +35,8 @@ export const getDurInfo = async() =>{
         console.error("데이터 불러오는 중 에러", error)
     }
 }
+
+
 
 export const storeDurInfo = async (value) =>{
     try{
@@ -41,6 +47,19 @@ export const storeDurInfo = async (value) =>{
 }
 
 export const removeMedicine = async (key) =>{
+    let isDurRemoved = false
+    const durInfo = await getDurInfo()
+    for(i in durInfo){
+        const idx = durInfo[i].ids.indexOf(Number(key))
+        console.log(idx)
+        if(idx !== -1){
+            durInfo.splice(i, 1)
+            isDurRemoved = true
+        }
+    }
+    if(isDurRemoved){
+        await storeDurInfo(durInfo)
+    }
     await removeData(key)
 }
 

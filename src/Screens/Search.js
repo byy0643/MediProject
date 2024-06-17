@@ -88,7 +88,7 @@ export default function Search(){
         else{
             return(
                 <View style={{borderWidth: 1, height: '60%', backgroundColor: 'white'}}>
-                    <ScrollView>
+                    <ScrollView style={{paddingHorizontal: 10}}>
                         <Dropdown
                             data = {filterObj.Filters[0].items}
                             search

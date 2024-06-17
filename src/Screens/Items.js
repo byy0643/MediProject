@@ -3,8 +3,9 @@ import { StyleSheet, SafeAreaView, Text, View, TouchableOpacity, Image, Touchabl
 import { useNavigation} from '@react-navigation/native'
 import { removeMedicine } from '../data/privateMediService'
 
-export default function Items({props, isDur}){//약품 리스트 포멧
+export default function Items({props, isDur, listRemoved}){//약품 리스트 포멧
     const navigation = useNavigation()
+    const moveList = useCallback(() => navigation.navigate('BottomTabNav'),[])
     const moveMediInfo = useCallback(() => navigation.navigate('MediInfo', {route: {
         id: props.id,
         medName: props.medName,
@@ -30,7 +31,7 @@ export default function Items({props, isDur}){//약품 리스트 포멧
     
     const remove = (id) =>{
         removeMedicine(id)
-        console.log("removed")
+        listRemoved
     }
 
     const _onLongPressButton = () => {
@@ -64,7 +65,7 @@ export default function Items({props, isDur}){//약품 리스트 포멧
 
 const styles = StyleSheet.create({
     viewBox: { flexDirection: "row", padding: 5, marginBottom: 5, borderWidth: 1, borderColor: 'black'},
-    durViewBox: { flexDirection: "row", padding: 5, marginBottom: 5, borderWidth: 1, borderColor: 'red'},
+    durViewBox: { flexDirection: "row", padding: 5, marginBottom: 5, borderWidth: 3, borderColor: 'red'},
     image: {width: 120, height: 65, borderWidth: 1, borderColor: 'black'},
     textBox: {marginHorizontal: 10, flex:1},
     mediName: {fontSize : 15, fontWeight: 'bold', color: 'black'},

@@ -4,7 +4,7 @@ import axios from 'axios'
 import { MD2Colors } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/Feather'
 import InteractionIcon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { storeMedicine, getAllMedicines } from '../data/privateMediService'
+import { storeMedicine, getAllMedicines, storeDurInfo } from '../data/privateMediService'
 import {  useNavigation } from '@react-navigation/native'
 
 
@@ -49,7 +49,7 @@ export default function MediInfo({route}){
         }
     }, [])
 
-    let medName
+    let name
     const getData = async () =>{
         try{
             const response = await axios.post("https://yakhakdasik.up.railway.app/meds/get-one", {"id": route.params.route.id},
@@ -60,9 +60,8 @@ export default function MediInfo({route}){
                     }
                 }
             )
-            medName = response.data.medName
             setMediInfo(response.data)
-            console.log(mediInfo)
+            console.log(response.data)
         }catch(error){
             console.error("약품 정보 받아오는 중 오류 발생", error)
         }
@@ -81,8 +80,11 @@ export default function MediInfo({route}){
 
 
     const addMedicine = async () => {
-        setDataObj({medications: medName})
+        name = mediInfo.medName
+        console.log(name)
+        setDataObj({medications: [name]})
         await getListIDs()
+
         Object.assign(dataObj, ids)
         console.log("재전송할 데이터", dataObj)
         const response = await axios.post("https://yakhakdasik.up.railway.app/meds/get-info", dataObj, 
@@ -91,11 +93,13 @@ export default function MediInfo({route}){
                 'Accept': '*/*',
                 'Content-Type': 'application/json'
             }
-        }
-        
-        )
+        })
         console.log(response.data)
-        
+        storeMedicine(response.data.medInfos[0].id.toString(), response.data.medInfos[0])
+        if(response.data.durInfos.length > 0){
+            await storeDurInfo(response.data.durInfos)
+        }
+        moveList()
     }
 
     return(
@@ -110,16 +114,16 @@ export default function MediInfo({route}){
             
             <View style={styles.infoBox}>
                 <Image src={mediInfo.image} style={styles.image}/>
-                <View style={{marginLeft: 10}}>
+                <View style={{marginLeft: 10, flex: 1}}>
                     <Text style={{color: MD2Colors.red200}}>{mediInfo.medClass}</Text>
-                    <Text style={{color: 'black', fontSize: 30, flex: 1}}>{mediInfo.medName}</Text>
+                    <Text style={{color: 'black',fontSize: 16, flex: 1}}>{mediInfo.medName}</Text>
                     <Text>{mediInfo.companyName}</Text>
                 </View>
             </View>
             <View style={{marginBottom: 10}}>
                 <Text>{mediInfo.effect}</Text>
             </View>
-        <ScrollView>
+
             <View style={styles.subBox}>
                 <FlatList
                     ListHeaderComponent={<Text style={styles.subTitle}>복용하기 전에..</Text>}
@@ -204,7 +208,6 @@ export default function MediInfo({route}){
                 }
             </View>
 
-            </ScrollView>
         </SafeAreaView>
     )
 }
